@@ -1,0 +1,17 @@
+html, body { width:100%; height:100%; min-height:0; overflow:hidden; overscroll-behavior:none; }
+.arcade { position:fixed; inset:0; width:var(--viewport-width,100vw); height:var(--viewport-height,100dvh); max-width:none; margin:0; padding:0; }
+.masthead { display:none; }
+.game-shell { width:100%; height:100%; min-height:0; max-height:none; margin:0; aspect-ratio:auto; border:0; border-radius:0; }
+.hud { top:max(12px,env(safe-area-inset-top)); left:max(20px,env(safe-area-inset-left)); right:max(20px,env(safe-area-inset-right)); }
+.overlay { padding: max(24px,env(safe-area-inset-top)) max(28px,env(safe-area-inset-right)) max(45px,env(safe-area-inset-bottom)) max(28px,env(safe-area-inset-left)); }
+.rotate-prompt { width:var(--viewport-width,100vw); height:var(--viewport-height,100dvh); }
+footer { position:absolute; z-index:4; bottom:max(5px,env(safe-area-inset-bottom)); right:max(14px,env(safe-area-inset-right)); width:auto; margin:0; padding:0; gap:12px; }
+footer>span { display:none; }
+footer button { min-height:32px; padding:6px 10px; background:#182b4680; border-radius:6px; color:#e1e9ee; }
+.aim-hint { bottom:max(42px,calc(env(safe-area-inset-bottom) + 35px)); }
+@media (orientation:landscape) and (max-height:450px) {
+  .overlay { padding-top:max(16px,env(safe-area-inset-top)); padding-bottom:max(38px,env(safe-area-inset-bottom)); }
+  .memory .polaroid img { height:min(45dvh,210px); }
+  .ending .final-photo img { height:min(25dvh,120px); }
+  .ending .final-gif { height:72px; width:160px; }
+}

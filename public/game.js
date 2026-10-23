@@ -4,14 +4,17 @@ const ctx = canvas.getContext('2d');
 const GRAVITY = 470;
 const SPEED = 620;
 const fallback = { src: '/assets/memory.svg', caption: 'My favourite team. Us.' };
-let memories = Array.from({ length: 6 }, () => ({ photos: [fallback.src], caption: fallback.caption }));
+let memories = Array.from({ length: 7 }, () => ({ photos: [fallback.src], caption: fallback.caption }));
 let photoIndex = 0, lossIndex = 0;
 let lossImages = ['/assets/triggerfish.svg'];
 const W = 960, H = 540;
+const view = { scale: 1, x: 0, y: 0, left: 0, top: 0, right: W, bottom: H };
 let state = 'intro', kills = 0, lives = 5;
 let player, enemies = [], ragdolls = [], projectiles = [], particles = [], angle = -0.35;
 let dragging = false, pointerId = null, cooldown = 0, enemyClock = 0, elapsed = 0;
-let soundOn = false, audio, lastTime = 0;
+let soundOn = true, audio, lastTime = 0, musicStarted = false;
+const music = $('background-music');
+music.volume = 0.22;
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 $('start').disabled = true;
@@ -32,15 +35,23 @@ $('fish-image').addEventListener('error', () => { if (!$('fish-image').src.endsW
 function resize() {
   const rect = canvas.getBoundingClientRect();
   const scale = Math.min(devicePixelRatio || 1, 2);
+  if (!rect.width || !rect.height) return;
+  view.scale = Math.min(rect.width / W, rect.height / H);
+  view.x = (rect.width - W * view.scale) / 2;
+  view.y = (rect.height - H * view.scale) / 2;
+  view.left = -view.x / view.scale; view.top = -view.y / view.scale;
+  view.right = W - view.left; view.bottom = H - view.top;
   canvas.width = Math.round(rect.width * scale); canvas.height = Math.round(rect.height * scale);
-  ctx.setTransform(canvas.width / W, 0, 0, canvas.height / H, 0, 0);
+  ctx.setTransform(scale * view.scale, 0, 0, scale * view.scale, scale * view.x, scale * view.y);
   if (!player) placeCharacters();
 }
 function placeCharacters() {
   player = { x: W * 0.18, y: H * 0.72, color: '#fcf7f0' };
-  const count = Math.min(3, 1 + Math.floor(kills / 2));
-  const positions = count === 1 ? [[0.80, kills % 2 ? 0.49 : 0.64]] : count === 2 ? [[0.67, 0.43], [0.84, 0.69]] : [[0.66, 0.28], [0.85, 0.49], [0.65, 0.72]];
-  enemies = positions.map(([x, y], i) => ({ x: W * x, y: H * y, color: '#f7a6b5', alive: true, hp: kills >= 4 ? 2 : 1, speed: kills >= 4 ? 490 : 420, clock: -i * 0.5, interval: [4.8,4.1,3.5,2.8,2.05,1.65][Math.min(kills,5)] + i * 0.12 }));
+  // The new opening round precedes the original six-level difficulty curve.
+  const difficulty = Math.max(0, kills - 1);
+  const count = Math.min(3, 1 + Math.floor(difficulty / 2));
+  const positions = count === 1 ? [[0.80, difficulty % 2 ? 0.49 : 0.64]] : count === 2 ? [[0.67, 0.43], [0.84, 0.69]] : [[0.66, 0.28], [0.85, 0.49], [0.65, 0.72]];
+  enemies = positions.map(([x, y], i) => ({ x: W * x, y: H * y, color: '#f7a6b5', alive: true, hp: difficulty >= 4 ? 2 : 1, speed: kills === 0 ? 350 : difficulty >= 4 ? 490 : 420, aimSpread: difficulty >= 4 ? 20 : 48, clock: -i * 0.5, interval: (kills === 0 ? 6 : [4.8,4.1,3.5,2.8,2.05,1.65][Math.min(difficulty,5)]) + i * 0.12 }));
 }
 new ResizeObserver(resize).observe(canvas);
 
@@ -55,6 +66,23 @@ function tone(frequency = 400, duration = 0.1, type = 'sine') {
     gain.gain.exponentialRampToValueAtTime(0.001, audio.currentTime + duration);
     osc.connect(gain).connect(audio.destination); osc.start(); osc.stop(audio.currentTime + duration);
   } catch { /* Sound is optional on browsers that disallow audio. */ }
+}
+function updateSoundButton() {
+  $('sound').textContent = `Sound ${soundOn ? 'on' : 'off'} ♫`;
+  $('sound').setAttribute('aria-pressed', String(soundOn));
+}
+async function playMusic() {
+  if (!soundOn || document.hidden) return;
+  try { await music.play(); musicStarted = true; }
+  catch (error) {
+    // A browser denial or missing audio must never prevent playing the game.
+    if (error.name !== 'AbortError') { soundOn = false; updateSoundButton(); }
+  }
+}
+function playFromTap(action) {
+  void playMusic();
+  void enterFullscreen();
+  action();
 }
 function show(next) {
   state = next; dragging = false; pointerId = null;
@@ -133,7 +161,7 @@ function fire() {
 // Solve the lower ballistic arc so enemy spears are aimed, with a small miss allowance.
 function enemyAim(enemy) {
   const dx = enemy.x - player.x;
-  const rise = enemy.y - player.y + (Math.random() - 0.5) * (kills >= 4 ? 20 : 48);
+  const rise = enemy.y - player.y + (Math.random() - 0.5) * enemy.aimSpread;
   const speed2 = enemy.speed ** 2;
   const discriminant = speed2 ** 2 - GRAVITY * (GRAVITY * dx ** 2 + 2 * rise * speed2);
   if (discriminant < 0) return Math.PI + Math.PI / 4;
@@ -141,7 +169,7 @@ function enemyAim(enemy) {
 }
 function pointerAngle(event) {
   const rect = canvas.getBoundingClientRect();
-  const x = (event.clientX - rect.left) * W / rect.width, y = (event.clientY - rect.top) * H / rect.height;
+  const x = (event.clientX - rect.left - view.x) / view.scale, y = (event.clientY - rect.top - view.y) / view.scale;
   angle = Math.max(-1.35, Math.min(0.65, Math.atan2(y - (player.y - 43), Math.max(20, x - player.x))));
 }
 canvas.addEventListener('pointerdown', event => {
@@ -163,17 +191,28 @@ document.addEventListener('keydown', event => {
   if (event.code === 'Space') fire();
 });
 function resume() { show('playing'); canvas.focus({ preventScroll: true }); }
-$('start').onclick = start; $('retry').onclick = nextEnemy; $('replay').onclick = start;
-$('pause').onclick = () => show('paused'); $('resume').onclick = resume;
+$('start').onclick = () => playFromTap(start);
+$('retry').onclick = () => playFromTap(nextEnemy);
+$('replay').onclick = () => playFromTap(start);
+$('pause').onclick = () => show('paused');
+$('resume').onclick = () => playFromTap(resume);
 $('continue').onclick = () => {
   if (photoIndex < memories[kills - 1].photos.length - 1) { photoIndex++; showRewardPhoto(); }
   else nextEnemy();
 };
 for (const id of ['previous-photo', 'final-previous']) $(id).onclick = () => { if (photoIndex > 0) { photoIndex--; showRewardPhoto(); } };
-$('sound').onclick = () => { soundOn = !soundOn; $('sound').textContent = `Sound ${soundOn ? 'on' : 'off'} ♫`; $('sound').setAttribute('aria-pressed', String(soundOn)); tone(600); };
-document.addEventListener('visibilitychange', () => { if (document.hidden && state === 'playing') show('paused'); });
+$('sound').onclick = () => {
+  soundOn = !soundOn; updateSoundButton();
+  if (soundOn) void playMusic(); else music.pause();
+};
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    music.pause();
+    if (state === 'playing') show('paused');
+  } else if (soundOn && musicStarted) void playMusic();
+});
 
-const portraitPhone = matchMedia('(max-width: 650px) and (orientation: portrait)');
+const portraitPhone = matchMedia('(orientation: portrait) and ((max-width: 650px) or (pointer: coarse))');
 function updateOrientation() {
   $('rotate-prompt').hidden = !portraitPhone.matches;
   document.querySelector('.arcade').inert = portraitPhone.matches;
@@ -181,7 +220,13 @@ function updateOrientation() {
 }
 portraitPhone.addEventListener('change', updateOrientation);
 updateOrientation();
-async function enterFullscreen() {
+let fullscreenRequest = null;
+function enterFullscreen() {
+  if (document.fullscreenElement || fullscreenRequest) return fullscreenRequest;
+  fullscreenRequest = requestFullscreen().finally(() => { fullscreenRequest = null; syncViewport(); });
+  return fullscreenRequest;
+}
+async function requestFullscreen() {
   try {
     if (!document.fullscreenElement && document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen();
     if (screen.orientation?.lock) await screen.orientation.lock('landscape');
@@ -197,6 +242,17 @@ $('fullscreen').onclick = async () => {
   } else await enterFullscreen();
 };
 document.addEventListener('fullscreenchange', () => { $('fullscreen').textContent = document.fullscreenElement ? 'Exit fullscreen ⛶' : 'Fullscreen ⛶'; });
+function syncViewport() {
+  const viewport = window.visualViewport;
+  document.documentElement.style.setProperty('--viewport-width', `${viewport?.width || innerWidth}px`);
+  document.documentElement.style.setProperty('--viewport-height', `${viewport?.height || innerHeight}px`);
+  requestAnimationFrame(resize);
+}
+window.addEventListener('resize', syncViewport);
+window.visualViewport?.addEventListener('resize', syncViewport);
+screen.orientation?.addEventListener('change', syncViewport);
+document.addEventListener('fullscreenchange', syncViewport);
+syncViewport();
 
 // Swept collision: test the path travelled this frame, avoiding missed hits at low frame rates.
 function intersectsCharacter(x0, y0, x1, y1, target, headOnly = false) {
@@ -236,13 +292,13 @@ function update(dt) {
         const remaining = enemies.filter(enemy => enemy.alive).length;
         $('aim-hint').textContent = remaining ? `${remaining} ${remaining === 1 ? 'enemy' : 'enemies'} left. You've got this.` : 'Going… going…';
       } else { hitPlayer(); if (state !== 'playing') return; }
-    } else if (p.x < -80 || p.x > W + 80 || p.y > H + 80) projectiles.splice(i, 1);
+    } else if (p.x < view.left - 80 || p.x > view.right + 80 || p.y > view.bottom + 80) projectiles.splice(i, 1);
   }
   particles = particles.filter(p => p.life > 0);
   for (const p of particles) { p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 180 * dt; p.life -= dt; }
   for (const doll of ragdolls) stepRagdoll(doll, dt);
   // A reward waits for the final body to completely leave the visible arena.
-  ragdolls = ragdolls.filter(doll => !doll.points.every(p => p.y > H + 25 || p.x > W + 65 || p.x < -65));
+  ragdolls = ragdolls.filter(doll => !doll.points.every(p => p.y > view.bottom + 25 || p.x > view.right + 65 || p.x < view.left - 65));
   if (enemies.every(enemy => !enemy.alive) && ragdolls.length === 0) finishLevel();
 }
 
@@ -307,14 +363,14 @@ function island(x, y, size, accent) {
   for (let i = 0; i < 5; i++) { const xx = x - size + 9 + i * size * 0.38; line([[xx, y], [xx + 2, y - 8], [xx + 5, y - 2]], accent, 1); }
 }
 function draw() {
-  const sky = ctx.createLinearGradient(0, 0, 0, H); sky.addColorStop(0, '#203650'); sky.addColorStop(1, '#476880'); ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
-  for (let i = 0; i < 38; i++) { const x = ((i * 137.5 + 18) % 997) / 997 * W, y = ((i * 71 + 26) % 400) / 650 * H; circle(x, y, i % 3 ? 1 : 1.7, '#d5dbe076'); }
+  const sky = ctx.createLinearGradient(0, view.top, 0, view.bottom); sky.addColorStop(0, '#203650'); sky.addColorStop(1, '#476880'); ctx.fillStyle = sky; ctx.fillRect(view.left, view.top, view.right-view.left, view.bottom-view.top);
+  for (let i = 0; i < 38; i++) { const x = view.left + ((i * 137.5 + 18) % 997) / 997 * (view.right-view.left), y = ((i * 71 + 26) % 400) / 650 * H; circle(x, y, i % 3 ? 1 : 1.7, '#d5dbe076'); }
   circle(W * 0.78, H * 0.23, W < 600 ? 30 : 43, '#f9dfaa');
   circle(W * 0.78 - 13, H * 0.23 - 10, W < 600 ? 27 : 38, '#243c56');
   for (let layer = 0; layer < 3; layer++) {
-    ctx.fillStyle = ['#36566c', '#2b485f', '#203c53'][layer]; ctx.beginPath(); ctx.moveTo(0, H);
-    for (let x = 0; x <= W + 35; x += 35) ctx.lineTo(x, H * (0.72 + layer * 0.075) - Math.sin(x / (130 + layer * 40) + layer * 2) * (35 - layer * 7));
-    ctx.lineTo(W, H); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = ['#36566c', '#2b485f', '#203c53'][layer]; ctx.beginPath(); ctx.moveTo(view.left, view.bottom);
+    for (let x = view.left; x <= view.right + 35; x += 35) ctx.lineTo(x, H * (0.72 + layer * 0.075) - Math.sin(x / (130 + layer * 40) + layer * 2) * (35 - layer * 7));
+    ctx.lineTo(view.right+35, view.bottom); ctx.closePath(); ctx.fill();
   }
   if (!player) return;
   island(player.x, player.y + 3, Math.min(W * 0.12, 74), '#a7c7b4');
