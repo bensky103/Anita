@@ -1,0 +1,50 @@
+.game-shell { width:min(100%,calc((100svh - 136px) * 16 / 9)); height:auto; min-height:0; aspect-ratio:16/9; margin-inline:auto; }
+.rotate-prompt { position:fixed; inset:0; z-index:10; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px; background:#182b46; text-align:center; }
+.rotate-prompt h2 { font-size:42px; }
+.rotate-prompt p { color:#d4dee6; line-height:1.6; max-width:300px; }
+.phone-symbol { color:#f7a6b5; font-size:80px; margin-bottom:20px; }
+@media (orientation:landscape) and (max-height:600px) {
+  .arcade { padding:6px max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left)); max-width:none; }
+  .masthead { display:none; }
+  .game-shell { width:min(100%,calc((100svh - 38px) * 16 / 9)); border-radius:10px; }
+  footer { max-width:850px; margin:auto; padding-top:5px; font-size:9px; gap:12px; }
+  .desktop-help { display:none; }
+  footer button { font-size:10px; }
+  .hud { top:10px; left:16px; right:16px; gap:12px; }
+  .hud-label { font-size:9px; margin-bottom:3px; }
+  .lives #hearts { font-size:16px; letter-spacing:2px; }
+  .progress>span:last-child { font-size:15px; }
+  .icon-button { width:30px; height:30px; }
+  .aim-hint { bottom:10px; font-size:11px; }
+  .overlay { padding:14px 22px; }
+  .intro { margin-right:30%; max-width:330px; }
+  .intro .heart-mark { display:none; }
+  .intro h1 { font-size:45px; margin:8px 0; }
+  .intro .eyebrow { font-size:11px; margin:5px 0; }
+  .intro .intro-copy { font-size:13px; line-height:1.3; margin:8px 0; }
+  .primary { min-height:40px; padding:10px 18px; font-size:12px; }
+  .intro .primary { margin-top:5px; }
+  .intro .instructions { font-size:10px; margin-top:12px; line-height:1.4; }
+  .memory, .ending, #death { display:grid; max-width:660px; grid-template-columns:1fr 1fr; column-gap:25px; align-items:center; }
+  .memory .polaroid { grid-column:1; grid-row:1/5; width:min(100%,250px); margin:0 auto; }
+  .memory .polaroid img { height:min(49svh,240px); }
+  .memory .eyebrow { grid-column:2; grid-row:1; font-size:11px; margin:0; }
+  .memory h2 { grid-column:2; grid-row:2; font-size:29px; margin:10px 0; }
+  .memory #continue { grid-column:2; grid-row:3; justify-self:center; margin:0; }
+  .memory .previous-photo { grid-column:2; grid-row:4; margin:6px auto 0; }
+  .ending .final-photo { grid-column:1; grid-row:1/4; width:180px; margin:0 auto 10px; padding:8px; }
+  .ending .final-photo img { height:min(28svh,140px); }
+  .ending .polaroid figcaption { font-size:12px; padding-top:7px; }
+  .ending .final-gif { grid-column:1; grid-row:4/6; width:180px; height:81px; margin:0 auto; }
+  .ending .eyebrow { grid-column:2; grid-row:1; font-size:11px; margin:0; }
+  .ending h2 { grid-column:2; grid-row:2; font-size:34px; margin:10px 0; }
+  .ending>p:not(.eyebrow) { grid-column:2; grid-row:3; font-size:12px; margin:0 0 8px; }
+  .ending #replay { grid-column:2; grid-row:4; justify-self:center; }
+  .ending .previous-photo { grid-column:2; grid-row:5; margin:4px auto 0; }
+  #death .fish { grid-column:1; grid-row:1/5; width:100%; height:190px; }
+  #death .eyebrow { grid-column:2; grid-row:1; font-size:11px; margin:0; }
+  #death h2 { grid-column:2; grid-row:2; font-size:34px; margin:8px 0; }
+  #death>p:not(.eyebrow) { grid-column:2; grid-row:3; font-size:12px; margin:0; }
+  #death .primary { grid-column:2; grid-row:4; justify-self:center; }
+  #paused h2 { font-size:32px; }
+}

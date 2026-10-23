@@ -1,0 +1,11 @@
+{
+  "memories": [
+    { "photos": ["/assets/photos/win/1.jpeg", "/assets/photos/win/2.jpeg", "/assets/photos/win/3.jpeg"], "caption": "My favourite team. Us." },
+    { "photos": ["/assets/photos/win/4.jpeg", "/assets/photos/win/5.jpeg", "/assets/photos/win/6.jpeg"], "caption": "Life is better with you." },
+    { "photos": ["/assets/photos/win/7.jpeg", "/assets/photos/win/8.jpeg", "/assets/photos/win/9.jpeg"], "caption": "I'd pick you. Every time." },
+    { "photos": ["/assets/photos/win/10.jpeg", "/assets/photos/win/11.jpeg", "/assets/photos/win/12.jpeg"], "caption": "More adventures like this, please." },
+    { "photos": ["/assets/photos/win/13.jpeg", "/assets/photos/win/14.jpeg", "/assets/photos/win/15.jpeg"], "caption": "You still give me butterflies." },
+    { "photos": ["/assets/photos/win/16.jpeg", "/assets/photos/win/17.jpeg", "/assets/photos/win/18.jpeg"], "caption": "My favourite place is next to you." }
+  ],
+  "lossImages": ["/assets/photos/lose/triggerfish1.jpg", "/assets/photos/lose/triggerfish2.jpg", "/assets/photos/lose/triggerfish3.jpg", "/assets/photos/lose/triggerfish4.jpeg"]
+}

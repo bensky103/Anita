@@ -1,0 +1,8 @@
+node_modules/
+.remember/
+artifacts/
+.env
+.env.*
+.playwright-mcp/
+photo_level_win/
+photo_level_lose/

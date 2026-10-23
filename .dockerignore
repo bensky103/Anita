@@ -1,0 +1,5 @@
+.git
+.remember
+node_modules
+artifacts
+README.md

@@ -1,0 +1,14 @@
+.overlay { overflow-y:auto; }
+.panel { margin-top:auto; margin-bottom:auto; flex-shrink:0; }
+.ending .final-photo { width:220px; margin:10px auto 15px; }
+.ending .final-photo img { height:155px; }
+.ending .final-gif { display:block; width:220px; height:99px; object-fit:cover; border-radius:6px; margin:0 auto 17px; }
+.ending h2 { font-size:38px; letter-spacing:-1px; margin:14px 0 8px; }
+.ending>p:not(.eyebrow) { margin:8px 0; font-size:14px; }
+.ending .primary { margin-top:8px; }
+.memory .polaroid { width:min(310px,100%); transform:rotate(-2deg); }
+.memory .polaroid img { height:clamp(190px,35svh,320px); object-fit:contain; background:#e9e6e0; }
+.ending .final-photo img { object-fit:contain; background:#e9e6e0; }
+.previous-photo { display:block; margin:15px auto 0; padding:7px 12px; border:0; background:transparent; color:#d4dee6; text-decoration:underline; font-size:12px; }
+.fish { width:min(300px,100%); max-height:230px; border-radius:8px; }
+@media(max-height:700px){.ending .final-photo{width:180px}.ending .final-photo img{height:115px}.ending .final-gif{width:180px;height:81px;margin-bottom:12px}.ending h2{font-size:30px}.ending .eyebrow{margin:5px 0}}

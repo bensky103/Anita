@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#182b46">
+  <meta name="description" content="A little birthday adventure, made with love. And spears.">
+  <title>Love at first spear</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3E%3Ctext y='40' font-size='40'%3E💘%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/ending.css">
+  <link rel="stylesheet" href="/landscape.css">
+  <script type="module" src="/game.js"></script>
+</head>
+<body>
+  <section id="rotate-prompt" class="rotate-prompt" hidden aria-labelledby="rotate-title">
+    <div class="phone-symbol" aria-hidden="true">↶ ▱</div>
+    <h2 id="rotate-title">A little sideways<br>adventure.</h2>
+    <p id="rotate-help">Rotate your phone to play.<br>This one's made for landscape.</p>
+    <button class="primary" id="rotate-fullscreen">Try fullscreen <span>⛶</span></button>
+  </section>
+  <main class="arcade">
+    <header class="masthead"><a href="/" aria-label="Love at first spear home">a little game, just for you <span>♡</span></a><span class="edition">Birthday edition</span></header>
+    <section class="game-shell" aria-label="Birthday spear game">
+      <div class="hud"><div class="lives"><span class="hud-label">Your lovely life</span><span id="hearts" aria-label="5 lives remaining">♥ ♥ ♥ ♥ ♥</span></div><div class="progress"><span class="hud-label">Levels cleared</span><span><b id="score">0</b> / <b id="total">6</b> <span class="tiny-heart">♡</span></span></div><button id="pause" class="icon-button" aria-label="Pause game" hidden>Ⅱ</button></div>
+      <canvas id="game" tabindex="0" aria-label="Spear game. Drag to aim and release to throw. Keyboard: arrow keys to aim, space to throw, P to pause."></canvas>
+      <div id="aim-hint" class="aim-hint" hidden>Drag to aim. Release to make a point.</div>
+      <div class="overlay" id="overlay">
+        <section class="panel intro" id="intro" aria-labelledby="intro-title">
+          <div class="heart-mark" aria-hidden="true">♡<span>↗</span></div>
+          <p class="eyebrow">For my favourite person</p>
+          <h1 id="intro-title">Love at<br>first spear<span>.</span></h1>
+          <p class="intro-copy">A few tiny enemies.<br>A whole lot of us.</p>
+          <button class="primary" id="start">Let's make a point <span>↗</span></button>
+          <p class="instructions">Drag to aim · Release to throw<br><span id="photo-intro">Six levels. Eighteen little memories.</span></p>
+        </section>
+        <section class="panel memory" id="memory" hidden aria-labelledby="memory-title">
+          <p class="eyebrow" id="memory-count" aria-live="polite">A little memory</p>
+          <figure class="polaroid"><img id="memory-image" src="/assets/memory.svg" alt="An illustrated placeholder for a photo of you two"><figcaption id="caption">My favourite team. Us.</figcaption></figure>
+          <h2 id="memory-title">Got them. Still got you.</h2>
+          <button class="primary" id="continue">One more? <span>↗</span></button>
+          <button class="previous-photo" id="previous-photo" hidden>Previous photo</button>
+        </section>
+        <section class="panel" id="death" hidden aria-labelledby="death-title">
+          <p class="eyebrow">Well, this is awkward.</p>
+          <img class="fish" id="fish-image" src="/assets/triggerfish.svg" alt="A cheeky illustrated triggerfish">
+          <h2 id="death-title">You've been<br>triggerfished.</h2>
+          <p>Even the fish wants another round.</p>
+          <button class="primary" id="retry">Okay, rematch <span>↻</span></button>
+        </section>
+        <section class="panel ending" id="ending" hidden aria-labelledby="ending-title">
+          <p class="eyebrow">Every time. In every lifetime.</p>
+          <figure class="polaroid final-photo"><img id="final-image" src="/assets/memory.svg" alt="Our final photo"><figcaption id="final-caption">You + me. Always.</figcaption></figure>
+          <img id="final-gif" class="final-gif" alt="Stilgar says Lisan al Gaib" width="220" height="99">
+          <h2 id="ending-title">I will love you forever.</h2>
+          <p>Happy birthday, my Shredrik.</p>
+          <button class="primary" id="replay">You + me, again <span>♡</span></button>
+          <button class="previous-photo" id="final-previous" hidden>Previous photo</button>
+        </section>
+        <section class="panel" id="paused" hidden aria-labelledby="paused-title"><p class="eyebrow">Take your time</p><h2 id="paused-title">Love can wait.<br>So can the spears.</h2><button class="primary" id="resume">Back to us <span>↗</span></button></section>
+      </div>
+    </section>
+    <footer><span>Made with love. And questionable aim.</span><span class="desktop-help">↑ ↓ aim &nbsp; Space throw &nbsp; P pause</span><button id="fullscreen">Fullscreen ⛶</button><button id="sound" aria-pressed="false">Sound off ♫</button></footer>
+  </main>
+</body>
+</html>
